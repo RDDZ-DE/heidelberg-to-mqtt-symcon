@@ -1,9 +1,9 @@
 {
     "id": "{DD3CEB0D-102F-4075-96BE-AE7A23259AAD}",
     "name": "HeidelbergToMQTT",
-    "version": "1.0.1",
-    "build": 2,
-    "date": 1785674078,
+    "version": "1.0.2",
+    "build": 3,
+    "date": 1785676083,
     "author": "Dennis",
     "url": "https://github.com/RDDZ-DE/heidelberg-to-mqtt-symcon",
     "compatibility": {

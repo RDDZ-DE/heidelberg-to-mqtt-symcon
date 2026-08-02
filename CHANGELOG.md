@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.2] - 2026-08-01
+
+### Geändert
+- Zahlenwerte (Ladestrom, Spannung, Leistung, Energie, Temperatur, WLAN-Signal,
+  Laufzeit, freier Speicher) zeigen die Einheit jetzt direkt hinter dem Wert
+  an (z.B. "5,90 A" statt getrennt "Ladestrom L1 (A)" / "5.90"), passend zum
+  Look anderer Symcon-Module. Dafür eigene, typsichere Variablenprofile
+  (`HTMQ.*`) angelegt statt eingebauter Profile wie `~Watt`/`~Ampere` -
+  vermeidet die Typkonflikte, die es beim ESP32-Script damit gab.
+
 ## [1.0.1] - 2026-08-01
 
 ### Behoben

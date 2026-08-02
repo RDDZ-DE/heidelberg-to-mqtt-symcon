@@ -9,35 +9,51 @@ class HeidelbergToMQTTDevice extends IPSModule
     // GUID, die der Splitter als "Implemented" erwartet (Nachrichten VON uns AN den Splitter)
     private const MQTT_TX_GUID = '{043EA491-0325-4ADD-8FC2-A30C8EEB4D3F}';
 
-    // Feld-Definition: Property-Suffix => [Ident, Name, VariablenTyp, MQTT-Subtopic, Werttyp]
+    // Feld-Definition: Property-Suffix => [Ident, Name, VariablenTyp, MQTT-Subtopic, Werttyp, Profil]
     // VariablenTyp: 0=Boolean, 1=Integer, 2=Float, 3=String (Symcon-Standardkonstanten)
     private const FELDER = [
-        'LayoutVersion'    => ['LayoutVersion',    'Modbus Layout-Version',        1, 'info/layout_version',          'int'],
-        'HardwareVariante' => ['HardwareVariante',  'Hardware-Variante',            1, 'info/hardware_variante',       'int'],
-        'SoftwareRevision' => ['SoftwareRevision',  'Software-Revision',            1, 'info/software_revision',       'int'],
-        'HwMinAmpere'      => ['HwMinAmpere',       'Hardware Min. Ladestrom (A)',  1, 'info/hw_min_ampere',           'int'],
-        'HwMaxAmpere'      => ['HwMaxAmpere',       'Hardware Max. Ladestrom (A)',  1, 'info/hw_max_ampere',           'int'],
+        'LayoutVersion'    => ['LayoutVersion',    'Modbus Layout-Version',   1, 'info/layout_version',          'int',    ''],
+        'HardwareVariante' => ['HardwareVariante',  'Hardware-Variante',      1, 'info/hardware_variante',       'int',    ''],
+        'SoftwareRevision' => ['SoftwareRevision',  'Software-Revision',      1, 'info/software_revision',       'int',    ''],
+        'HwMinAmpere'      => ['HwMinAmpere',       'Hardware Min. Ladestrom',1, 'info/hw_min_ampere',           'int',    'HTMQ.AmpereInt'],
+        'HwMaxAmpere'      => ['HwMaxAmpere',       'Hardware Max. Ladestrom',1, 'info/hw_max_ampere',           'int',    'HTMQ.AmpereInt'],
 
-        'Ladezustand'      => ['Ladezustand',       'Ladezustand (Rohwert)',        1, 'status/ladezustand',           'int'],
-        'StromL1'          => ['StromL1',           'Ladestrom L1 (A)',             2, 'status/strom_l1',              'float'],
-        'StromL2'          => ['StromL2',           'Ladestrom L2 (A)',             2, 'status/strom_l2',              'float'],
-        'StromL3'          => ['StromL3',           'Ladestrom L3 (A)',             2, 'status/strom_l3',              'float'],
-        'Temperatur'       => ['Temperatur',        'Temperatur (°C)',              2, 'status/temperatur',            'float'],
-        'SpannungL1'       => ['SpannungL1',        'Spannung L1 (V)',              1, 'status/spannung_l1',           'int'],
-        'SpannungL2'       => ['SpannungL2',        'Spannung L2 (V)',              1, 'status/spannung_l2',           'int'],
-        'SpannungL3'       => ['SpannungL3',        'Spannung L3 (V)',              1, 'status/spannung_l3',           'int'],
-        'LeistungVA'       => ['LeistungVA',        'Leistung (VA)',                1, 'status/leistung_va',           'int'],
-        'EnergieGesamt'    => ['EnergieGesamt',     'Energie gesamt (Wh)',          1, 'status/energie_gesamt_wh',     'int'],
-        'ExternGesperrt'   => ['ExternGesperrt',    'Extern gesperrt',              0, 'status/extern_gesperrt',       'bool'],
-        'ModbusFehler'     => ['ModbusFehler',      'Modbus-Fehlerzähler',          1, 'status/modbus_fehler',         'int'],
+        'Ladezustand'      => ['Ladezustand',       'Ladezustand (Rohwert)',  1, 'status/ladezustand',           'int',    ''],
+        'StromL1'          => ['StromL1',           'Ladestrom L1',           2, 'status/strom_l1',              'float',  'HTMQ.Ampere'],
+        'StromL2'          => ['StromL2',           'Ladestrom L2',           2, 'status/strom_l2',              'float',  'HTMQ.Ampere'],
+        'StromL3'          => ['StromL3',           'Ladestrom L3',           2, 'status/strom_l3',              'float',  'HTMQ.Ampere'],
+        'Temperatur'       => ['Temperatur',        'Temperatur',             2, 'status/temperatur',            'float',  'HTMQ.Celsius'],
+        'SpannungL1'       => ['SpannungL1',        'Spannung L1',            1, 'status/spannung_l1',           'int',    'HTMQ.Volt'],
+        'SpannungL2'       => ['SpannungL2',        'Spannung L2',            1, 'status/spannung_l2',           'int',    'HTMQ.Volt'],
+        'SpannungL3'       => ['SpannungL3',        'Spannung L3',            1, 'status/spannung_l3',           'int',    'HTMQ.Volt'],
+        'LeistungVA'       => ['LeistungVA',        'Leistung',               1, 'status/leistung_va',           'int',    'HTMQ.VA'],
+        'EnergieGesamt'    => ['EnergieGesamt',     'Energie gesamt',         1, 'status/energie_gesamt_wh',     'int',    'HTMQ.Wh'],
+        'ExternGesperrt'   => ['ExternGesperrt',    'Extern gesperrt',        0, 'status/extern_gesperrt',       'bool',   '~Switch'],
+        'ModbusFehler'     => ['ModbusFehler',      'Modbus-Fehlerzähler',    1, 'status/modbus_fehler',         'int',    ''],
 
-        'Ssid'             => ['Ssid',              'WLAN SSID',                    3, 'wifi/ssid',                   'string'],
-        'Bssid'            => ['Bssid',             'WLAN Access Point (BSSID)',    3, 'wifi/bssid',                  'string'],
-        'RssiDbm'          => ['RssiDbm',           'WLAN Signal (dBm)',            1, 'wifi/rssi_dbm',               'int'],
-        'RssiProzent'      => ['RssiProzent',       'WLAN Signal (%)',              1, 'wifi/rssi_prozent',           'int'],
-        'Ip'               => ['Ip',                'IP-Adresse',                   3, 'wifi/ip',                     'string'],
-        'UptimeS'          => ['UptimeS',           'Laufzeit seit Boot (s)',       1, 'wifi/uptime_s',               'int'],
-        'FreierSpeicher'   => ['FreierSpeicher',    'Freier Speicher (Bytes)',      1, 'wifi/freier_speicher_bytes',  'int'],
+        'Ssid'             => ['Ssid',              'WLAN SSID',              3, 'wifi/ssid',                   'string', ''],
+        'Bssid'            => ['Bssid',             'WLAN Access Point',      3, 'wifi/bssid',                  'string', ''],
+        'RssiDbm'          => ['RssiDbm',           'WLAN Signal',            1, 'wifi/rssi_dbm',               'int',    'HTMQ.Dbm'],
+        'RssiProzent'      => ['RssiProzent',       'WLAN Signal',            1, 'wifi/rssi_prozent',           'int',    'HTMQ.Prozent'],
+        'Ip'               => ['Ip',                'IP-Adresse',             3, 'wifi/ip',                     'string', ''],
+        'UptimeS'          => ['UptimeS',           'Laufzeit seit Boot',     1, 'wifi/uptime_s',               'int',    'HTMQ.Sekunden'],
+        'FreierSpeicher'   => ['FreierSpeicher',    'Freier Speicher',        1, 'wifi/freier_speicher_bytes',  'int',    'HTMQ.Bytes'],
+    ];
+
+    // Eigene Variablenprofile: Name => [VariablenTyp, Suffix]. Bewusst KEINE eingebauten
+    // Symcon-Profile wie ~Watt/~Ampere verwendet - die haben teils andere Typen als erwartet
+    // (z.B. ~Ampere ist Float) und führen bei falscher Zuordnung zu Laufzeitfehlern.
+    private const PROFILE = [
+        'HTMQ.Ampere'    => [2, ' A'],
+        'HTMQ.AmpereInt' => [1, ' A'],
+        'HTMQ.Volt'      => [1, ' V'],
+        'HTMQ.VA'        => [1, ' VA'],
+        'HTMQ.Wh'        => [1, ' Wh'],
+        'HTMQ.Celsius'   => [2, ' °C'],
+        'HTMQ.Dbm'       => [1, ' dBm'],
+        'HTMQ.Prozent'   => [1, ' %'],
+        'HTMQ.Bytes'     => [1, ' Bytes'],
+        'HTMQ.Sekunden'  => [1, ' s'],
     ];
 
     public function Create()
@@ -69,14 +85,19 @@ class HeidelbergToMQTTDevice extends IPSModule
             return;
         }
 
+        foreach (self::PROFILE as $profilName => $profilInfo) {
+            [$profilTyp, $suffix] = $profilInfo;
+            $this->SicherstelleProfil($profilName, $profilTyp, $suffix);
+        }
+
         foreach (self::FELDER as $key => $info) {
-            [$ident, $name, $varType] = $info;
+            [$ident, $name, $varType, , , $profil] = $info;
             $aktiv = $this->ReadPropertyBoolean('Import_' . $key);
-            $this->MaintainVariable($ident, $name, $varType, '', 0, $aktiv);
+            $this->MaintainVariable($ident, $name, $varType, $profil, 0, $aktiv);
         }
 
         // Schreibbare Steuervariable: immer angelegt, da sie den eigentlichen Zweck des Moduls ausmacht
-        $this->MaintainVariable('LadestromSoll', 'Ladestrom-Vorgabe (A)', 1, '', 100, true);
+        $this->MaintainVariable('LadestromSoll', 'Ladestrom-Vorgabe', 1, 'HTMQ.AmpereInt', 100, true);
         $this->EnableAction('LadestromSoll');
 
         // Lesbare Text-Variante des Ladezustands, aus dem Rohwert übersetzt
@@ -191,6 +212,21 @@ class HeidelbergToMQTTDevice extends IPSModule
             case 11: return 'Fehler';
             default: return 'Unbekannt (' . $wert . ')';
         }
+    }
+
+    private function SicherstelleProfil(string $name, int $typ, string $suffix): void
+    {
+        if (IPS_VariableProfileExists($name)) {
+            $vorhandenerTyp = IPS_GetVariableProfile($name)['ProfileType'];
+            if ($vorhandenerTyp !== $typ) {
+                // Falscher Typ von früherer Version -> neu anlegen, sonst SetVariableProfileText-Fehler
+                IPS_DeleteVariableProfile($name);
+            }
+        }
+        if (!IPS_VariableProfileExists($name)) {
+            IPS_CreateVariableProfile($name, $typ);
+        }
+        IPS_SetVariableProfileText($name, '', $suffix);
     }
 
     private function WandleWert(string $payload, string $werttyp)
