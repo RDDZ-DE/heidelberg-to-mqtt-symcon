@@ -51,6 +51,11 @@ class HeidelbergToMQTTDevice extends IPSModule
             // ersten Anlegen direkt sinnvolle Werte sieht - abwählen kann man jederzeit über das Formular.
             $this->RegisterPropertyBoolean('Import_' . $key, true);
         }
+
+        // Prüft den Parent-Status regelmäßig selbst nach, statt sich allein auf IOChangeState zu
+        // verlassen - falls der MQTT-Client schon vor uns aktiv war, feuert IOChangeState nämlich
+        // nie, weil sich für Symcon in dem Fall gar nichts "ändert".
+        $this->RegisterTimer('StatusPruefen', 30000, 'HTMQ_PruefeVerbindung($_IPS[\'TARGET\']);');
     }
 
     public function ApplyChanges()
@@ -73,29 +78,41 @@ class HeidelbergToMQTTDevice extends IPSModule
         $this->MaintainVariable('LadestromSoll', 'Ladestrom-Vorgabe (A)', 1, '', 100, true);
         $this->EnableAction('LadestromSoll');
 
-        if (!$this->HasActiveParent()) {
-            $this->SetStatus(202);
-            return;
+        $this->PruefeVerbindung();
+    }
+
+    /**
+     * Prüft den Parent-Verbindungsstatus und korrigiert unseren eigenen Status + abonniert bei
+     * Bedarf neu. Wird sowohl von ApplyChanges als auch alle 30s per Timer aufgerufen, sowie von
+     * IOChangeState bei einem echten Verbindungswechsel - dreifach abgesichert, damit der Status
+     * nie dauerhaft falsch hängen bleibt.
+     */
+    public function PruefeVerbindung(): void
+    {
+        $chipId = $this->ReadPropertyString('ChipID');
+        if ($chipId === '') {
+            return; // Status 201 (keine Chip-ID) bleibt unverändert bestehen
         }
 
-        $this->AbonniereNeu();
-        $this->SetStatus(102);
+        if ($this->HasActiveParent()) {
+            $warAktiv = ($this->GetStatus() == 102);
+            $this->SetStatus(102);
+            if (!$warAktiv) {
+                $this->AbonniereNeu(); // nur bei echtem Wechsel neu abonnieren, nicht bei jedem Timer-Tick
+            }
+        } else {
+            $this->SetStatus(202);
+        }
     }
 
     /**
      * Wird von Symcon automatisch aufgerufen, sobald sich der Verbindungsstatus der
-     * übergeordneten Instanz (MQTT-Client) ändert - z.B. beim Symcon-Start, falls der
-     * MQTT-Client erst NACH dieser Instanz vollständig verbindet. Ohne diesen Hook bliebe
-     * der Status auf "Kein Parent" hängen, obwohl der Datenfluss längst funktioniert.
+     * übergeordneten Instanz (MQTT-Client) ändert. Zusätzliche, sofortige Absicherung neben
+     * dem 30s-Timer.
      */
     public function IOChangeState($State)
     {
-        if ($State == IS_ACTIVE) {
-            $this->SetStatus(102);
-            $this->AbonniereNeu();
-        } else {
-            $this->SetStatus(202);
-        }
+        $this->PruefeVerbindung();
     }
 
     /**
