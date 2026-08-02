@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3] - 2026-08-01
+
+### Geändert
+- "Leistung" zeigt jetzt "W" statt "VA" an (Leistungsfaktor bei Wallbox-Ladung
+  praktisch immer ~1, daher inhaltlich unbedenklich - der Rohwert aus
+  Register 14 bleibt technisch weiterhin die Scheinleistung).
+
 ## [1.0.2] - 2026-08-01
 
 ### Geändert
