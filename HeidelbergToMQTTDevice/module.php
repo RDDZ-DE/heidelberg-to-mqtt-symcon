@@ -51,7 +51,6 @@ class HeidelbergToMQTTDevice extends IPSModule
             // ersten Anlegen direkt sinnvolle Werte sieht - abwählen kann man jederzeit über das Formular.
             $this->RegisterPropertyBoolean('Import_' . $key, true);
         }
-        $this->RegisterPropertyBoolean('Import_LadestromSoll', false);
     }
 
     public function ApplyChanges()
@@ -70,12 +69,9 @@ class HeidelbergToMQTTDevice extends IPSModule
             $this->MaintainVariable($ident, $name, $varType, '', 0, $aktiv);
         }
 
-        // Schreibbare Steuervariable separat, da sie eine Aktion (WebFront-Eingabe) braucht
-        $steuerungAktiv = $this->ReadPropertyBoolean('Import_LadestromSoll');
-        $this->MaintainVariable('LadestromSoll', 'Ladestrom-Vorgabe (A)', 1, '', 100, $steuerungAktiv);
-        if ($steuerungAktiv) {
-            $this->EnableAction('LadestromSoll');
-        }
+        // Schreibbare Steuervariable: immer angelegt, da sie den eigentlichen Zweck des Moduls ausmacht
+        $this->MaintainVariable('LadestromSoll', 'Ladestrom-Vorgabe (A)', 1, '', 100, true);
+        $this->EnableAction('LadestromSoll');
 
         if (!$this->HasActiveParent()) {
             $this->SetStatus(202);

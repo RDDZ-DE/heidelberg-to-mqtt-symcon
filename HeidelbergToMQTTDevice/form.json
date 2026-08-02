@@ -52,11 +52,8 @@
             ]
         },
         {
-            "type": "ExpansionPanel",
-            "caption": "Steuerung",
-            "items": [
-                { "type": "CheckBox", "name": "Import_LadestromSoll", "caption": "Ladestrom-Vorgabe (schreibbar, sendet an .../set/strom)" }
-            ]
+            "type": "Label",
+            "caption": "Die Ladestrom-Vorgabe (schreibbar, sendet an .../set/strom) wird immer angelegt."
         }
     ],
     "actions": [
