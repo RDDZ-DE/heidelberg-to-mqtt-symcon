@@ -87,6 +87,22 @@ class HeidelbergToMQTTDevice extends IPSModule
     }
 
     /**
+     * Wird von Symcon automatisch aufgerufen, sobald sich der Verbindungsstatus der
+     * übergeordneten Instanz (MQTT-Client) ändert - z.B. beim Symcon-Start, falls der
+     * MQTT-Client erst NACH dieser Instanz vollständig verbindet. Ohne diesen Hook bliebe
+     * der Status auf "Kein Parent" hängen, obwohl der Datenfluss längst funktioniert.
+     */
+    public function IOChangeState($State)
+    {
+        if ($State == IS_ACTIVE) {
+            $this->SetStatus(102);
+            $this->AbonniereNeu();
+        } else {
+            $this->SetStatus(202);
+        }
+    }
+
+    /**
      * Abonniert alle Topics der konfigurierten Wallbox neu. Öffentlich aufrufbar (Button im
      * Formular, Prefix HTMQ), falls die MQTT-Verbindung zwischenzeitlich unterbrochen war und
      * die Wallbox seitdem keine neue Nachricht mehr gesendet hat.

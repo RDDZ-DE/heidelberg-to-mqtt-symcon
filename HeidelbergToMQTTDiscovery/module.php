@@ -25,7 +25,21 @@ class HeidelbergToMQTTDiscovery extends IPSModule
     {
         parent::ApplyChanges();
         $this->AbonniereDiscoveryTopic();
-        $this->SetStatus(102);
+        $this->SetStatus($this->HasActiveParent() ? 102 : 202);
+    }
+
+    /**
+     * Wird von Symcon automatisch aufgerufen, sobald sich der Verbindungsstatus der
+     * übergeordneten Instanz (MQTT-Client) ändert.
+     */
+    public function IOChangeState($State)
+    {
+        if ($State == IS_ACTIVE) {
+            $this->SetStatus(102);
+            $this->AbonniereDiscoveryTopic();
+        } else {
+            $this->SetStatus(202);
+        }
     }
 
     private function AbonniereDiscoveryTopic(): void
