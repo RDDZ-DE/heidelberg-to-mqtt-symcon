@@ -1,6 +1,6 @@
 # Heidelberg-to-MQTT Symcon-Modul
 
-IP-Symcon-Modul für die [Heidelberg-to-MQTT](https://github.com/DEIN-USERNAME/heidelberg-to-mqtt)
+IP-Symcon-Modul für die [Heidelberg-to-MQTT](https://github.com/RDDZ-DE/heidelberg-to-mqtt)
 Firmware (ESP32-Bridge für die Heidelberg Wallbox Energy Control). Bildet die
 per MQTT veröffentlichten Daten als Symcon-Variablen ab und erlaubt die
 Steuerung des Ladestroms.
@@ -24,13 +24,13 @@ vermutlich schon für andere MQTT-Geräte nutzt.
 
 **Über die Modules Control (empfohlen):**
 1. In Symcon: Modules Control (Kern-Instanzen) → "+" → Git-URL dieses Repos
-   eintragen (`https://github.com/DEIN-USERNAME/heidelberg-to-mqtt-symcon`)
+   eintragen (`https://github.com/RDDZ-DE/heidelberg-to-mqtt-symcon`)
 2. Modul aktualisieren/laden lassen
 
 **Alternativ lokal** (z.B. unter Proxmox, per Bind-Mount o.ä.):
 ```
 cd /var/lib/symcon/modules
-git clone https://github.com/DEIN-USERNAME/heidelberg-to-mqtt-symcon.git
+git clone https://github.com/RDDZ-DE/heidelberg-to-mqtt-symcon.git
 ```
 Danach in Symcon: Modules Control → "Module neu laden".
 
