@@ -35,6 +35,7 @@ class HeidelbergToMQTTDiscovery extends IPSModule
                 'DataID'           => self::MQTT_TX_GUID,
                 'PacketType'       => 8, // SUBSCRIBE
                 'QualityOfService' => 0,
+                'Retain'           => false, // vom Interface für JEDES Paket verlangt, auch bei SUBSCRIBE
                 'Topic'            => self::DISCOVERY_TOPIC_FILTER
             ]));
         }

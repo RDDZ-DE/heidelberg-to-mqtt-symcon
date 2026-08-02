@@ -102,6 +102,7 @@ class HeidelbergToMQTTDevice extends IPSModule
             'DataID'           => self::MQTT_TX_GUID,
             'PacketType'       => 8, // SUBSCRIBE
             'QualityOfService' => 0,
+            'Retain'           => false, // vom Interface für JEDES Paket verlangt, auch bei SUBSCRIBE ohne eigentliche Bedeutung
             'Topic'            => 'heidelberg-to-mqtt/' . $chipId . '/#'
         ]));
     }
