@@ -1,0 +1,74 @@
+{
+    "elements": [
+        {
+            "type": "ValidationTextBox",
+            "name": "ChipID",
+            "caption": "Chip-ID der Wallbox (z.B. 47f7a608)"
+        },
+        {
+            "type": "Label",
+            "caption": "Wähle aus, welche Daten als Symcon-Variablen angelegt werden sollen. Änderungen wirken sich erst nach dem Speichern aus - bereits angelegte, dann abgewählte Variablen werden dabei entfernt."
+        },
+        {
+            "type": "ExpansionPanel",
+            "caption": "Info (statisch, einmalig beim Boot der Wallbox)",
+            "items": [
+                { "type": "CheckBox", "name": "Import_LayoutVersion", "caption": "Modbus Layout-Version" },
+                { "type": "CheckBox", "name": "Import_HardwareVariante", "caption": "Hardware-Variante" },
+                { "type": "CheckBox", "name": "Import_SoftwareRevision", "caption": "Software-Revision" },
+                { "type": "CheckBox", "name": "Import_HwMinAmpere", "caption": "Hardware Min. Ladestrom (A)" },
+                { "type": "CheckBox", "name": "Import_HwMaxAmpere", "caption": "Hardware Max. Ladestrom (A)" }
+            ]
+        },
+        {
+            "type": "ExpansionPanel",
+            "caption": "Status (laufend)",
+            "items": [
+                { "type": "CheckBox", "name": "Import_Ladezustand", "caption": "Ladezustand (Rohwert)" },
+                { "type": "CheckBox", "name": "Import_StromL1", "caption": "Ladestrom L1 (A)" },
+                { "type": "CheckBox", "name": "Import_StromL2", "caption": "Ladestrom L2 (A)" },
+                { "type": "CheckBox", "name": "Import_StromL3", "caption": "Ladestrom L3 (A)" },
+                { "type": "CheckBox", "name": "Import_Temperatur", "caption": "Temperatur (°C)" },
+                { "type": "CheckBox", "name": "Import_SpannungL1", "caption": "Spannung L1 (V)" },
+                { "type": "CheckBox", "name": "Import_SpannungL2", "caption": "Spannung L2 (V)" },
+                { "type": "CheckBox", "name": "Import_SpannungL3", "caption": "Spannung L3 (V)" },
+                { "type": "CheckBox", "name": "Import_LeistungVA", "caption": "Leistung (VA)" },
+                { "type": "CheckBox", "name": "Import_EnergieGesamt", "caption": "Energie gesamt (Wh)" },
+                { "type": "CheckBox", "name": "Import_ExternGesperrt", "caption": "Extern gesperrt" },
+                { "type": "CheckBox", "name": "Import_ModbusFehler", "caption": "Modbus-Fehlerzähler" }
+            ]
+        },
+        {
+            "type": "ExpansionPanel",
+            "caption": "WLAN/System-Diagnose (laufend)",
+            "items": [
+                { "type": "CheckBox", "name": "Import_Ssid", "caption": "WLAN SSID" },
+                { "type": "CheckBox", "name": "Import_Bssid", "caption": "WLAN Access Point (BSSID)" },
+                { "type": "CheckBox", "name": "Import_RssiDbm", "caption": "WLAN Signal (dBm)" },
+                { "type": "CheckBox", "name": "Import_RssiProzent", "caption": "WLAN Signal (%)" },
+                { "type": "CheckBox", "name": "Import_Ip", "caption": "IP-Adresse" },
+                { "type": "CheckBox", "name": "Import_UptimeS", "caption": "Laufzeit seit Boot (s)" },
+                { "type": "CheckBox", "name": "Import_FreierSpeicher", "caption": "Freier Speicher (Bytes)" }
+            ]
+        },
+        {
+            "type": "ExpansionPanel",
+            "caption": "Steuerung",
+            "items": [
+                { "type": "CheckBox", "name": "Import_LadestromSoll", "caption": "Ladestrom-Vorgabe (schreibbar, sendet an .../set/strom)" }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "type": "Button",
+            "caption": "Erneut abonnieren (nach MQTT-Verbindungsproblemen)",
+            "onClick": "HTMQ_AbonniereNeu($id);"
+        }
+    ],
+    "status": [
+        { "code": 102, "icon": "active", "caption": "Aktiv" },
+        { "code": 201, "icon": "inactive", "caption": "Chip-ID nicht konfiguriert" },
+        { "code": 202, "icon": "error", "caption": "Kein MQTT-Parent verbunden" }
+    ]
+}

@@ -1,0 +1,19 @@
+{
+    "id": "{0F558904-E329-4C58-A51D-3433C9A3BF1F}",
+    "name": "HeidelbergToMQTTDiscovery",
+    "type": 4,
+    "vendor": "",
+    "aliases": [
+        "Heidelberg to MQTT Suche",
+        "Heidelberg Wallbox Suche"
+    ],
+    "url": "",
+    "parentRequirements": [
+        "{043EA491-0325-4ADD-8FC2-A30C8EEB4D3F}"
+    ],
+    "childRequirements": [],
+    "implemented": [
+        "{7F7632D9-FA40-4F38-8DEA-C83CD4325A32}"
+    ],
+    "prefix": "HTMD"
+}
