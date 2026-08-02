@@ -51,6 +51,7 @@ class HeidelbergToMQTTDevice extends IPSModule
             // ersten Anlegen direkt sinnvolle Werte sieht - abwählen kann man jederzeit über das Formular.
             $this->RegisterPropertyBoolean('Import_' . $key, true);
         }
+        $this->RegisterPropertyBoolean('Import_LadezustandText', true);
 
         // Prüft den Parent-Status regelmäßig selbst nach, statt sich allein auf IOChangeState zu
         // verlassen - falls der MQTT-Client schon vor uns aktiv war, feuert IOChangeState nämlich
@@ -77,6 +78,9 @@ class HeidelbergToMQTTDevice extends IPSModule
         // Schreibbare Steuervariable: immer angelegt, da sie den eigentlichen Zweck des Moduls ausmacht
         $this->MaintainVariable('LadestromSoll', 'Ladestrom-Vorgabe (A)', 1, '', 100, true);
         $this->EnableAction('LadestromSoll');
+
+        // Lesbare Text-Variante des Ladezustands, aus dem Rohwert übersetzt
+        $this->MaintainVariable('LadezustandText', 'Ladezustand', 3, '', 5, $this->ReadPropertyBoolean('Import_LadezustandText'));
 
         $this->PruefeVerbindung();
     }
@@ -157,14 +161,36 @@ class HeidelbergToMQTTDevice extends IPSModule
             if ($mqttSubtopic !== $subtopic) {
                 continue;
             }
-            if (!$this->ReadPropertyBoolean('Import_' . $key)) {
-                continue; // Variable ist (bewusst) nicht angelegt -> Wert verwerfen
+            if ($this->ReadPropertyBoolean('Import_' . $key)) {
+                $this->SetValue($ident, $this->WandleWert($payload, $werttyp));
             }
-            $this->SetValue($ident, $this->WandleWert($payload, $werttyp));
+
+            // Zusätzlich: Ladezustand als Klartext, unabhängig vom Rohwert-Checkbox-Zustand
+            if ($key === 'Ladezustand' && $this->ReadPropertyBoolean('Import_LadezustandText')) {
+                $this->SetValue('LadezustandText', $this->LadezustandZuText((int) $payload));
+            }
             return '';
         }
 
         return '';
+    }
+
+    private function LadezustandZuText(int $wert): string
+    {
+        // Rohwerte laut Heidelberg-Registerdokumentation (Register 5), IEC-61851-Ladezustände
+        switch ($wert) {
+            case 2:  return 'Nicht verbunden';
+            case 3:  return 'Nicht verbunden';
+            case 4:  return 'Verbunden, lädt nicht';
+            case 5:  return 'Verbunden, lädt nicht';
+            case 6:  return 'Verbunden, lädt';
+            case 7:  return 'Verbunden, lädt';
+            case 8:  return 'Lädt (reduziert)';
+            case 9:  return 'Fehler';
+            case 10: return 'Gesperrt';
+            case 11: return 'Fehler';
+            default: return 'Unbekannt (' . $wert . ')';
+        }
     }
 
     private function WandleWert(string $payload, string $werttyp)

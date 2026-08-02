@@ -25,6 +25,7 @@
             "caption": "Status (laufend)",
             "items": [
                 { "type": "CheckBox", "name": "Import_Ladezustand", "caption": "Ladezustand (Rohwert)" },
+                { "type": "CheckBox", "name": "Import_LadezustandText", "caption": "Ladezustand (Klartext, z.B. \"Verbunden, lädt\")" },
                 { "type": "CheckBox", "name": "Import_StromL1", "caption": "Ladestrom L1 (A)" },
                 { "type": "CheckBox", "name": "Import_StromL2", "caption": "Ladestrom L2 (A)" },
                 { "type": "CheckBox", "name": "Import_StromL3", "caption": "Ladestrom L3 (A)" },
