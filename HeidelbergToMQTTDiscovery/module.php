@@ -19,27 +19,45 @@ class HeidelbergToMQTTDiscovery extends IPSModule
         $this->RegisterAttributeString('DiscoveredDevices', '[]');
         // Kein ConnectParent() mit geratener Modul-ID - der passende MQTT-Splitter/Client wird beim
         // ersten Anlegen der Instanz ganz normal im Objektbaum (Reiter "Anschluss") ausgewählt.
+
+        // Prüft den Parent-Status regelmäßig selbst nach, statt sich allein auf IOChangeState zu
+        // verlassen - falls der MQTT-Client schon vor uns aktiv war, feuert IOChangeState nämlich
+        // nie, weil sich für Symcon in dem Fall gar nichts "ändert".
+        $this->RegisterTimer('StatusPruefen', 30000, 'HTMD_PruefeVerbindung($_IPS[\'TARGET\']);');
     }
 
     public function ApplyChanges()
     {
         parent::ApplyChanges();
-        $this->AbonniereDiscoveryTopic();
-        $this->SetStatus($this->HasActiveParent() ? 102 : 202);
+        $this->PruefeVerbindung();
+    }
+
+    /**
+     * Prüft den Parent-Verbindungsstatus und korrigiert unseren eigenen Status + abonniert bei
+     * Bedarf neu. Wird von ApplyChanges, alle 30s per Timer, sowie von IOChangeState bei einem
+     * echten Verbindungswechsel aufgerufen - dreifach abgesichert.
+     */
+    public function PruefeVerbindung(): void
+    {
+        if ($this->HasActiveParent()) {
+            $warAktiv = ($this->GetStatus() == 102);
+            $this->SetStatus(102);
+            if (!$warAktiv) {
+                $this->AbonniereDiscoveryTopic();
+            }
+        } else {
+            $this->SetStatus(202);
+        }
     }
 
     /**
      * Wird von Symcon automatisch aufgerufen, sobald sich der Verbindungsstatus der
-     * übergeordneten Instanz (MQTT-Client) ändert.
+     * übergeordneten Instanz (MQTT-Client) ändert. Zusätzliche, sofortige Absicherung neben
+     * dem 30s-Timer.
      */
     public function IOChangeState($State)
     {
-        if ($State == IS_ACTIVE) {
-            $this->SetStatus(102);
-            $this->AbonniereDiscoveryTopic();
-        } else {
-            $this->SetStatus(202);
-        }
+        $this->PruefeVerbindung();
     }
 
     private function AbonniereDiscoveryTopic(): void
